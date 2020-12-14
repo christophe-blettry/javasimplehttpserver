@@ -305,31 +305,35 @@ public class TestClassTest {
 		assertTrue(result.contains(id2));
 	}
 
-//	/**
-//	 * Test of getTest7 method, of class TestClass.
-//	 */
-//	@Test
-//	public void testGetTest7() {
-//		System.out.println("getTest7");
-//		TestClass instance = new TestClass();
-//		String expResult = "";
-//		String result = instance.getTest7();
-//		assertEquals(expResult, result);
-//		// TODO review the generated test code and remove the default call to fail.
-//		fail("The test case is a prototype.");
-//	}
-//
-//	/**
-//	 * Test of getTest8 method, of class TestClass.
-//	 */
-//	@Test
-//	public void testGetTest8() {
-//		System.out.println("getTest8");
-//		TestClass instance = new TestClass();
-//		String expResult = "";
-//		String result = instance.getTest8();
-//		assertEquals(expResult, result);
-//		// TODO review the generated test code and remove the default call to fail.
-//		fail("The test case is a prototype.");
-//	}
+	/**
+	 * Test of getTest7 method, of class TestClass.
+	 */
+	@Test
+	public void testGetTest7() throws IOException {
+		System.out.println("getTest7");
+		Request request = new Request.Builder()
+				.url(server.getBaseUrl() + "/test7")
+				.build();
+		int result = 0;
+		try (Response response = client.newCall(request).execute()) {
+			result = response.code();
+		}
+		assertEquals(result, 409);
+	}
+
+	/**
+	 * Test of getTest8 method, of class TestClass.
+	 */
+	@Test
+	public void testGetTest8() throws IOException {
+		System.out.println("getTest8");
+		Request request = new Request.Builder()
+				.url(server.getBaseUrl() + "/test8")
+				.build();
+		int result = 0;
+		try (Response response = client.newCall(request).execute()) {
+			result = response.code();
+		}
+		assertEquals(result, 500);
+	}
 }
