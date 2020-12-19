@@ -48,7 +48,7 @@ Indicate location (befor starting thread)
 	server.setSearchClassForAnnotations(Collections.singleton("net.microfaas.net.simplehttp.example"));
 ````
 
-test example   [here] (https://github.com/christophe-blettry/javasimplehttpserver/blob/main/src/test/java/net/microfaas/net/simplehttp/main/TestClassTest.java)
+[test example]
 ````java
 public class TestClassTest {
 
@@ -68,3 +68,5 @@ public class TestClassTest {
 ````
 
 Example of an "api class" [here] (https://github.com/christophe-blettry/javasimplehttpserver/blob/main/src/main/java/net/microfaas/net/simplehttp/example/ApiExample.java)
+
+[test example]: https://github.com/christophe-blettry/javasimplehttpserver/blob/main/src/test/java/net/microfaas/net/simplehttp/main/TestClassTest.java
