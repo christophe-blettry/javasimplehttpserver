@@ -6,13 +6,13 @@
 package net.microfaas.net.simplehttp.exception;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
-import net.microfaas.net.simplehttp.HttpSimpleException;
+import net.microfaas.net.simplehttp.SimpleHttpException;
 
 /**
  *
  * @author christophe
  */
-public class ConflictException extends HttpSimpleException {
+public class ConflictException extends SimpleHttpException {
 
 
 	public ConflictException() {

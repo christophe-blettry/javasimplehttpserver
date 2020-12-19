@@ -48,7 +48,7 @@ public class HttpResponseEntity {
 		if(headers==null){
 			headers = new ArrayList<>();
 		}
-		headers.add(new SimpleEntry(name,value));
+		headers.add(new SimpleEntry<>(name,value));
 	}
 	
 }

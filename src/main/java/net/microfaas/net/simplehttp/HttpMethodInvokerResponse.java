@@ -5,6 +5,9 @@
  */
 package net.microfaas.net.simplehttp;
 
+import com.google.gson.Gson;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,17 +27,21 @@ public class HttpMethodInvokerResponse {
 		this.code = onSuccess;
 		if (methodResponse instanceof String) {
 			setBytes(((String) methodResponse).getBytes());
+			return;
 		}
 		if (methodResponse instanceof byte[]) {
 			setBytes((byte[]) methodResponse);
+			return;
 		}
 		if (methodResponse instanceof HttpResponseEntity) {
 			HttpResponseEntity e = (HttpResponseEntity) methodResponse;
 			setBytes(e.getBody());
 			setHeaders(e.getHeaders());	
 			this.code = e.getStatusCode() != 0 ? e.getStatusCode() : onSuccess;
+			return;
 		}
-
+		setBytes(new Gson().toJson(methodResponse).getBytes());
+		addJsonHeader();
 	}
 
 	public HttpMethodInvokerResponse(Exception exception) {
@@ -69,6 +76,14 @@ public class HttpMethodInvokerResponse {
 
 	public void setHeaders(List<Map.Entry<String, String>> headers) {
 		this.headers = headers;
+	}
+
+	private void addJsonHeader() {
+		if(this.headers==null){
+			this.headers=new ArrayList<>();
+		}
+		SimpleEntry<String,String> e = new SimpleEntry<>(HttpHeaderNames.CONTENT_TYPE.name(),HttpHeaderValues.JSON);
+		this.headers.add(e);
 	}
 
 }

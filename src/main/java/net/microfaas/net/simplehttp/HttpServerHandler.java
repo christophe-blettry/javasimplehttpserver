@@ -67,8 +67,8 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 				sendHttpResponse(ctx, req, r);
 				return;
 			}
-			if (b.getException() instanceof HttpSimpleException) {
-				HttpSimpleException ex = (HttpSimpleException) b.getException();
+			if (b.getException() instanceof SimpleHttpException) {
+				SimpleHttpException ex = (SimpleHttpException) b.getException();
 				ByteBuf reasonPhrase = ex.getReasonPhrase() != null ? Unpooled.wrappedBuffer(ex.getReasonPhrase().getBytes()) : ctx.alloc().buffer(0);
 				sendHttpResponse(ctx, req, new DefaultFullHttpResponse(req.protocolVersion(), ex.getStatus(), reasonPhrase));
 				return;

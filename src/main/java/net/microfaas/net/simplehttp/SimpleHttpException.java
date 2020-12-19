@@ -11,26 +11,26 @@ import io.netty.handler.codec.http.HttpResponseStatus;
  *
  * @author christophe
  */
-public class HttpSimpleException extends RuntimeException {
+public class SimpleHttpException extends RuntimeException {
 
 	private String reasonPhrase;
 	protected HttpResponseStatus status;
 
-	public HttpSimpleException() {
+	public SimpleHttpException() {
 		status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
 	}
 
-	public HttpSimpleException(String message) {
+	public SimpleHttpException(String message) {
 		super(message);
 		status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
 	}
 
-	public HttpSimpleException(String message, Throwable cause) {
+	public SimpleHttpException(String message, Throwable cause) {
 		super(message, cause);
 		status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
 	}
 
-	public HttpSimpleException(Throwable cause) {
+	public SimpleHttpException(Throwable cause) {
 		super(cause);
 		status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
 	}
@@ -43,7 +43,7 @@ public class HttpSimpleException extends RuntimeException {
 		return reasonPhrase;
 	}
 
-	public HttpSimpleException setReasonPhrase(String reasonPhrase) {
+	public SimpleHttpException setReasonPhrase(String reasonPhrase) {
 		this.reasonPhrase = reasonPhrase;
 		return this;
 	}

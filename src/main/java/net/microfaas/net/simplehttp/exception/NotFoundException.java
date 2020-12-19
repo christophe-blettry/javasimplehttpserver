@@ -6,13 +6,13 @@
 package net.microfaas.net.simplehttp.exception;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
-import net.microfaas.net.simplehttp.HttpSimpleException;
+import net.microfaas.net.simplehttp.SimpleHttpException;
 
 /**
  *
  * @author christophe
  */
-public class NotFoundException extends HttpSimpleException {
+public class NotFoundException extends SimpleHttpException {
 
 	public NotFoundException() {
 		status = HttpResponseStatus.NOT_FOUND;

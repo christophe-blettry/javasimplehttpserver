@@ -6,13 +6,13 @@
 package net.microfaas.net.simplehttp.exception;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
-import net.microfaas.net.simplehttp.HttpSimpleException;
+import net.microfaas.net.simplehttp.SimpleHttpException;
 
 /**
  *
  * @author christophe
  */
-public class BadRequestException extends HttpSimpleException {
+public class BadRequestException extends SimpleHttpException {
 
 	
 	public BadRequestException() {
@@ -21,14 +21,17 @@ public class BadRequestException extends HttpSimpleException {
 
 	public BadRequestException(String message) {
 		super(message);
+		 status=HttpResponseStatus.BAD_REQUEST;
 	}
 
 	public BadRequestException(String message, Throwable cause) {
 		super(message, cause);
+		 status=HttpResponseStatus.BAD_REQUEST;
 	}
 
 	public BadRequestException(Throwable cause) {
 		super(cause);
+		 status=HttpResponseStatus.BAD_REQUEST;
 	}
 
 }

@@ -19,5 +19,6 @@ import java.lang.annotation.Target;
 public @interface RequestHeader {
 
 	String value() default "";
+	HttpHeaderNames name() default HttpHeaderNames.NONE;
 	
 }

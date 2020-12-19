@@ -5,16 +5,19 @@
  */
 package net.microfaas.net.simplehttp.main;
 
+import net.microfaas.net.simplehttp.example.ApiExample;
+import net.microfaas.net.simplehttp.example.BeanExample;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import net.microfaas.net.simplehttp.HttpHeaderNames;
 import net.microfaas.net.simplehttp.HttpServer;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -44,7 +47,7 @@ public class TestClassTest {
 
 	@BeforeClass
 	public static void setUpClass() throws InterruptedException, ExecutionException, TimeoutException {
-		server.setSearchClassForAnnotations(Arrays.asList(new String[]{"net.microfaas.net.simplehttp.main"}));
+		server.setSearchClassForAnnotations(Collections.singleton("net.microfaas.net.simplehttp.example"));
 		Thread t = new Thread(server);
 		t.start();
 		server.getThreadStarted().get(10, TimeUnit.MINUTES);
@@ -64,7 +67,7 @@ public class TestClassTest {
 	}
 
 	/**
-	 * Test of getHello method, of class TestClass.
+	 * Test of getHello method, of class ApiExample.
 	 */
 	@Test
 	public void testGetHello() throws IOException {
@@ -76,11 +79,11 @@ public class TestClassTest {
 		try (Response response = client.newCall(request).execute()) {
 			result = response.body().string();
 		}
-		assertTrue(result.startsWith(TestClass.HELLO_W));
+		assertTrue(result.startsWith(ApiExample.HELLO_W));
 	}
 
 	/**
-	 * Test of getHeaderHost method, of class TestClass.
+	 * Test of getHeaderHost method, of class ApiExample.
 	 */
 	@Test
 	public void testGetHeaderHost() throws IOException {
@@ -96,7 +99,7 @@ public class TestClassTest {
 	}
 
 	/**
-	 * Test of addHeader method, of class TestClass.
+	 * Test of addHeader method, of class ApiExample.
 	 */
 	@Test
 	public void testAddHeader() throws IOException {
@@ -106,16 +109,16 @@ public class TestClassTest {
 				.build();
 		List<String> result = new ArrayList<>();
 		try (Response response = client.newCall(request).execute()) {
-			result = response.headers(TestClass.ADD_HEADER_NAME);
+			result = response.headers(ApiExample.ADD_HEADER_NAME);
 		}
 		assertFalse(result.isEmpty());
 		if (!result.isEmpty()) {
-			assertTrue(result.get(0).startsWith(TestClass.ADD_HEADER_VALUE));
+			assertTrue(result.get(0).startsWith(ApiExample.ADD_HEADER_VALUE));
 		}
 	}
 
 	/**
-	 * Test of getHeaderUserAgent method, of class TestClass.
+	 * Test of getHeaderUserAgent method, of class ApiExample.
 	 */
 	@Test
 	public void testGetHeaderUserAgent() throws IOException {
@@ -132,7 +135,28 @@ public class TestClassTest {
 	}
 
 	/**
-	 * Test of getNoContent method, of class TestClass.
+	 * Test of getHeaderAuth method, of class ApiExample.
+	 */
+	@Test
+	public void testGetHeaderAuth() throws IOException {
+		System.out.println("getHeaderAuth");
+		String auth = "Bearer " + UUID.randomUUID().toString();
+		Request request = new Request.Builder()
+				.url(server.getBaseUrl() + "/auth")
+				.addHeader(HttpHeaderNames.AUTHORIZATION.toString(), auth)
+				.build();
+		int resultCode = 0;
+		String result = null;
+		try (Response response = client.newCall(request).execute()) {
+			resultCode = response.code();
+			result = response.body().string();
+		}
+		assertEquals(resultCode, 200);
+		assertEquals(result, auth);
+	}
+
+	/**
+	 * Test of getNoContent method, of class ApiExample.
 	 */
 	@Test
 	public void testGetNoContent() throws IOException {
@@ -148,7 +172,7 @@ public class TestClassTest {
 	}
 
 	/**
-	 * Test of postTest method, of class TestClass.
+	 * Test of postTest method, of class ApiExample.
 	 */
 	@Test
 	public void testPostTest_0args() throws IOException {
@@ -166,15 +190,15 @@ public class TestClassTest {
 	}
 
 	/**
-	 * Test of postTest method, of class TestClass.
+	 * Test of postTest method, of class ApiExample.
 	 */
 	@Test
 	public void testPostTest_TestDto() throws IOException {
 		System.out.println("postTestDto");
 		String name = "NAME" + UUID.randomUUID().toString();
 		int value = random.nextInt(Integer.MAX_VALUE - 10);
-		TestDto dto = new TestDto(value, name);
-		System.out.println("postTestDto: dto: "+dto.toString());
+		BeanExample dto = new BeanExample(value, name);
+		System.out.println("postTestDto: dto: " + dto.toString());
 		RequestBody reqbody = RequestBody.create(new Gson().toJson(dto), JSON);
 		Request request = new Request.Builder()
 				.url(server.getBaseUrl() + "/post2")
@@ -185,7 +209,7 @@ public class TestClassTest {
 		try (Response response = client.newCall(request).execute()) {
 			resultCode = response.code();
 			result = response.body().string();
-			System.out.println("postTestDto: result: "+result);
+			System.out.println("postTestDto: result: " + result);
 		}
 		assertEquals(resultCode, 200);
 		assertTrue(result.contains(name.toUpperCase()));
@@ -193,14 +217,14 @@ public class TestClassTest {
 	}
 
 	/**
-	 * Test of getTest2 method, of class TestClass.
+	 * Test of getTest2 method, of class ApiExample.
 	 */
 	@Test
 	public void testGetTest2() throws IOException {
 		System.out.println("getTest2");
 		String id = UUID.randomUUID().toString();
 		Request request = new Request.Builder()
-				.url(server.getBaseUrl() + "/test2/"+id)
+				.url(server.getBaseUrl() + "/test2/" + id)
 				.build();
 		int resultCode = 0;
 		String result = null;
@@ -209,19 +233,19 @@ public class TestClassTest {
 			result = response.body().string();
 		}
 		assertEquals(resultCode, 200);
-		assertTrue(result.contains(TestClass.TEST2));
+		assertTrue(result.contains(ApiExample.TEST2));
 		assertTrue(result.contains(id));
 	}
 
 	/**
-	 * Test of getTest3 method, of class TestClass.
+	 * Test of getTest3 method, of class ApiExample.
 	 */
 	@Test
 	public void testGetTest3() throws IOException {
 		System.out.println("getTest3");
 		String id = UUID.randomUUID().toString();
 		Request request = new Request.Builder()
-				.url(server.getBaseUrl() + "/test3?id="+id)
+				.url(server.getBaseUrl() + "/test3?id=" + id)
 				.build();
 		int resultCode = 0;
 		String result = null;
@@ -230,12 +254,12 @@ public class TestClassTest {
 			result = response.body().string();
 		}
 		assertEquals(resultCode, 200);
-		assertTrue(result.contains(TestClass.TEST3));
+		assertTrue(result.contains(ApiExample.TEST3));
 		assertTrue(result.contains(id));
 	}
 
 	/**
-	 * Test of getTest4 method, of class TestClass.
+	 * Test of getTest4 method, of class ApiExample.
 	 */
 	@Test
 	public void testGetTest4() throws IOException {
@@ -243,7 +267,7 @@ public class TestClassTest {
 		String id = UUID.randomUUID().toString();
 		String id2 = UUID.randomUUID().toString();
 		Request request = new Request.Builder()
-				.url(server.getBaseUrl() + "/test4/"+id+"/test4/"+id2)
+				.url(server.getBaseUrl() + "/test4/" + id + "/test4/" + id2)
 				.build();
 		int resultCode = 0;
 		String result = null;
@@ -252,13 +276,13 @@ public class TestClassTest {
 			result = response.body().string();
 		}
 		assertEquals(resultCode, 200);
-		assertTrue(result.contains(TestClass.TEST4));
+		assertTrue(result.contains(ApiExample.TEST4));
 		assertTrue(result.contains(id));
 		assertTrue(result.contains(id2));
 	}
 
 	/**
-	 * Test of getTest5 method, of class TestClass.
+	 * Test of getTest5 method, of class ApiExample.
 	 */
 	@Test
 	public void testGetTest5() throws IOException {
@@ -266,7 +290,7 @@ public class TestClassTest {
 		String id = UUID.randomUUID().toString();
 		String id2 = UUID.randomUUID().toString();
 		Request request = new Request.Builder()
-				.url(server.getBaseUrl() + "/test5?id="+id+"&id2="+id2)
+				.url(server.getBaseUrl() + "/test5?id=" + id + "&id2=" + id2)
 				.build();
 		int resultCode = 0;
 		String result = null;
@@ -275,13 +299,13 @@ public class TestClassTest {
 			result = response.body().string();
 		}
 		assertEquals(resultCode, 200);
-		assertTrue(result.contains(TestClass.TEST5));
+		assertTrue(result.contains(ApiExample.TEST5));
 		assertTrue(result.contains(id));
 		assertTrue(result.contains(id2));
 	}
 
 	/**
-	 * Test of getTest6 method, of class TestClass.
+	 * Test of getTest6 method, of class ApiExample.
 	 */
 	@Test
 	public void testGetTest6() throws IOException {
@@ -290,7 +314,7 @@ public class TestClassTest {
 		String id = UUID.randomUUID().toString();
 		String id2 = UUID.randomUUID().toString();
 		Request request = new Request.Builder()
-				.url(server.getBaseUrl() + "/test6/"+rp+"/test6?id="+id+"&id2="+id2)
+				.url(server.getBaseUrl() + "/test6/" + rp + "/test6?id=" + id + "&id2=" + id2)
 				.build();
 		int resultCode = 0;
 		String result = null;
@@ -299,14 +323,14 @@ public class TestClassTest {
 			result = response.body().string();
 		}
 		assertEquals(resultCode, 200);
-		assertTrue(result.contains(TestClass.TEST6));
+		assertTrue(result.contains(ApiExample.TEST6));
 		assertTrue(result.contains(rp));
 		assertTrue(result.contains(id));
 		assertTrue(result.contains(id2));
 	}
 
 	/**
-	 * Test of getTest7 method, of class TestClass.
+	 * Test of getTest7 method, of class ApiExample.
 	 */
 	@Test
 	public void testGetTest7() throws IOException {
@@ -322,7 +346,7 @@ public class TestClassTest {
 	}
 
 	/**
-	 * Test of getTest8 method, of class TestClass.
+	 * Test of getTest8 method, of class ApiExample.
 	 */
 	@Test
 	public void testGetTest8() throws IOException {
@@ -335,5 +359,30 @@ public class TestClassTest {
 			result = response.code();
 		}
 		assertEquals(result, 500);
+	}
+
+		/**
+	 * Test of getTest6 method, of class ApiExample.
+	 */
+	@Test
+	public void testBean() throws IOException {
+		System.out.println("testBean");
+		String name = UUID.randomUUID().toString();
+		int value = new Random().nextInt(Integer.MAX_VALUE);
+		BeanExample bean = new BeanExample(value,name);
+		System.out.println("testBean: bean:       "+bean);
+		Request request = new Request.Builder()
+				.url(server.getBaseUrl() + "/beanexample?value=" + value + "&name=" + name)
+				.build();
+		int resultCode = 0;
+		String result = null;
+		try (Response response = client.newCall(request).execute()) {
+			resultCode = response.code();
+			result = response.body().string();
+			BeanExample beanResult = new Gson().fromJson(result, BeanExample.class);
+			System.out.println("testBean: beanResult: "+beanResult);
+			assertEquals(resultCode, 200);
+			assertTrue(bean.equals(beanResult));
+		}
 	}
 }

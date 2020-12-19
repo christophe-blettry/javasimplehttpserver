@@ -19,6 +19,7 @@ import java.security.cert.CertificateException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,7 +36,7 @@ public class HttpServer implements Runnable {
 	private final String host;
 	private boolean ssl = false;
 	private boolean selfSigned = false;
-	private List<String> searchClassForAnnotations;
+	private Set<String> searchClassForAnnotations;
 	private Thread currentThread;
 	private CompletableFuture<Boolean> threadStarted = new CompletableFuture<>();
 
@@ -54,7 +55,7 @@ public class HttpServer implements Runnable {
 		this.host = "localhost";
 	}
 
-	public void setSearchClassForAnnotations(List<String> searchClassForAnnotations) {
+	public void setSearchClassForAnnotations(Set<String> searchClassForAnnotations) {
 		this.searchClassForAnnotations = searchClassForAnnotations;
 	}
 
@@ -82,9 +83,9 @@ public class HttpServer implements Runnable {
 	}
 
 	private void parseClasses() {
-		List<Class> allClasses = ClasspathInspector.getMatchingClasses(searchClassForAnnotations);
+		List<Class<?>> allClasses = ClasspathInspector.getMatchingClasses(searchClassForAnnotations);
 		allClasses.forEach(cl -> {
-			Method methods[] = cl.getDeclaredMethods();
+			Method[] methods = cl.getDeclaredMethods();
 			if (methods != null) {
 				Arrays.asList(methods).forEach(m -> {
 					if (m.isAnnotationPresent(RequestMapping.class)) {
@@ -122,8 +123,11 @@ public class HttpServer implements Runnable {
 			this.threadStarted.complete(true);
 			ch.closeFuture().sync();
 		} catch (InterruptedException ex) {
+			this.threadStarted.completeExceptionally(ex);
 			System.out.println("interrupted " + ex.toString());
+			Thread.currentThread().interrupt();
 		} finally {
+			this.threadStarted.complete(true);
 			bossGroup.shutdownGracefully();
 			workerGroup.shutdownGracefully();
 		}

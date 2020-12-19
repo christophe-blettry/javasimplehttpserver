@@ -6,13 +6,13 @@
 package net.microfaas.net.simplehttp.exception;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
-import net.microfaas.net.simplehttp.HttpSimpleException;
+import net.microfaas.net.simplehttp.SimpleHttpException;
 
 /**
  *
  * @author christophe
  */
-public class UnauthorizedException extends HttpSimpleException {
+public class UnauthorizedException extends SimpleHttpException {
 
 	public UnauthorizedException() {
 		status = HttpResponseStatus.UNAUTHORIZED;

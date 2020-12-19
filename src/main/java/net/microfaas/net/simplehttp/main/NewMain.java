@@ -6,8 +6,9 @@
 package net.microfaas.net.simplehttp.main;
 
 import java.util.Arrays;
+import java.util.Collections;
 import net.microfaas.net.simplehttp.HttpServer;
-import net.microfaas.net.simplehttp.HttpSimpleException;
+import net.microfaas.net.simplehttp.SimpleHttpException;
 
 /**
  *
@@ -18,9 +19,9 @@ public class NewMain {
 	/**
 	 * @param args the command line arguments
 	 */
-	public static void main(String[] args) throws HttpSimpleException  {
+	public static void main(String[] args) throws SimpleHttpException  {
 		HttpServer server = new HttpServer();
-		server.setSearchClassForAnnotations(Arrays.asList(new String[]{"net.microfaas.net.simplehttp.main"}));
+		server.setSearchClassForAnnotations(Collections.singleton("net.microfaas.net.simplehttp.example"));
 		Thread t = new Thread(server);
 		t.start();
 	}

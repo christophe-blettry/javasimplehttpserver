@@ -1,7 +1,6 @@
 package net.microfaas.net.simplehttp.util;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.MalformedURLException;
@@ -10,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
@@ -24,11 +24,11 @@ import java.util.logging.Logger;
 @SuppressWarnings("unchecked")
 public class ClasspathInspector {
 
-	static boolean DEBUG = false;
-	static List<String> validPackagePrefixes;
+	static boolean debug = false;
+	static Set<String> validPackagePrefixes;
 
-	public static List<Class> getAllKnownClasses() {
-		List<Class> classFiles = new ArrayList<>();
+	public static List<Class<?>> getAllKnownClasses() {
+		List<Class<?>> classFiles = new ArrayList<>();
 		List<File> classLocations = getClassLocationsForCurrentClasspath();
 		for (File file : classLocations) {
 			classFiles.addAll(getClassesFromPath(file));
@@ -36,29 +36,25 @@ public class ClasspathInspector {
 		return classFiles;
 	}
 
-	public static List<Class> getMatchingClasses(Class interfaceOrSuperclass) {
-		List<Class> matchingClasses = new ArrayList<>();
-		List<Class> classes = getAllKnownClasses();
+	public static List<Class<?>> getMatchingClasses(Class<?> interfaceOrSuperclass) {
+		List<Class<?>> matchingClasses = new ArrayList<>();
+		List<Class<?>> classes = getAllKnownClasses();
 		log("checking %s classes", classes.size());
-		for (Class clazz : classes) {
-			if (interfaceOrSuperclass.isAssignableFrom(clazz)) {
-				matchingClasses.add(clazz);
-				log("class %s is assignable from %s", interfaceOrSuperclass, clazz);
-			}
-		}
+		classes.stream().filter(clazz -> (interfaceOrSuperclass.isAssignableFrom(clazz))).map(clazz -> {
+			matchingClasses.add(clazz);
+			return clazz;
+		}).forEachOrdered(clazz -> {
+			log("class %s is assignable from %s", interfaceOrSuperclass, clazz);
+		});
 		return matchingClasses;
 	}
 
-	public static List<Class> getMatchingClasses(String validPackagePrefix, Class interfaceOrSuperclass) {
-		throw new IllegalStateException("Not yet implemented!");
-	}
-
-	public static List<Class> getMatchingClasses(List<String> validPackagePref) {
+	public static List<Class<?>> getMatchingClasses(Set<String> validPackagePref) {
 		validPackagePrefixes = validPackagePref;
 		return getAllKnownClasses();
 	}
 
-	private static Collection<? extends Class> getClassesFromPath(File path) {
+	private static Collection<? extends Class<?>> getClassesFromPath(File path) {
 		if (path.isDirectory()) {
 			return getClassesFromDirectory(path);
 		} else {
@@ -77,62 +73,55 @@ public class ClasspathInspector {
 		return validPackagePrefixes.stream().filter(name -> className.startsWith(name)).count() > 0;
 	}
 
-	private static List<Class> getClassesFromJarFile(File path) {
-		List<Class> classes = new ArrayList<>();
-		log("getClassesFromJarFile: Getting classes for " + path);
+	private static List<Class<?>> getClassesFromJarFile(File path) {
+		List<Class<?>> classes = new ArrayList<>();
+		log("getClassesFromJarFile: Getting classes for %s", path);
 
 		try {
 			if (path.canRead()) {
-				JarFile jar = new JarFile(path);
-				Enumeration<JarEntry> en = jar.entries();
-				while (en.hasMoreElements()) {
-					JarEntry entry = en.nextElement();
-					if (entry.getName().endsWith("class")) {
-						String className = fromFileToClassName(entry.getName());
-						log("\tgetClassesFromJarFile: found " + className);
-						if (isClassNameMatches(className)) {
-							try {
-								Class claz = Class.forName(className);
-								classes.add(claz);
-							} catch (ClassNotFoundException ex) {
-								Logger.getLogger(ClasspathInspector.class.getName()).log(Level.SEVERE, null, ex);
-							}
-						}
-					}
+				try (JarFile jar = new JarFile(path)) {
+					classes.addAll(walkOnJar(jar));
 				}
 			}
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to read classes from jar file: " + path, e);
 		}
-
 		return classes;
 	}
 
-	private static List<Class> getClassesFromDirectory(File path) {
-		List<Class> classes = new ArrayList<>();
-		log("getClassesFromDirectory: Getting classes for " + path);
+	private static List<Class<?>> walkOnJar(JarFile jar) {
+		List<Class<?>> classes = new ArrayList<>();
+		Enumeration<JarEntry> en = jar.entries();
+		while (en.hasMoreElements()) {
+			JarEntry entry = en.nextElement();
+			if (entry.getName().endsWith("class")) {
+				String className = fromFileToClassName(entry.getName());
+				log("\twalkOnJar: found %s", className);
+				if (isClassNameMatches(className)) {
+					try {
+						classes.add(Class.forName(className));
+					} catch (ClassNotFoundException ex) {
+						Logger.getLogger(ClasspathInspector.class.getName()).log(Level.SEVERE, null, ex);
+					}
+				}
+			}
+		}
+		return classes;
+	}
+
+	private static List<Class<?>> getClassesFromDirectory(File path) {
+		List<Class<?>> classes = new ArrayList<>();
+		log("getClassesFromDirectory: Getting classes for %s", path);
 
 		// get jar files from top-level directory
-		List<File> jarFiles = listFiles(path, new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				return name.endsWith(".jar");
-			}
-		}, false);
+		List<File> jarFiles = listFiles(path, ".jar", false);
 		for (File file : jarFiles) {
 			classes.addAll(getClassesFromJarFile(file));
 		}
 
 		// get all class-files
-		List<File> classFiles = listFiles(path, new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				return name.endsWith(".class");
-			}
-		}, true);
+		List<File> classFiles = listFiles(path, ".class", true);
 
-		// List<URL> urlList = new ArrayList<URL>();
-		// List<String> classNameList = new ArrayList<String>();
 		int substringBeginIndex = path.getAbsolutePath().length() + 1;
 		for (File classfile : classFiles) {
 			String className = classfile.getAbsolutePath().substring(substringBeginIndex);
@@ -141,7 +130,7 @@ public class ClasspathInspector {
 				log("Found class %s in path %s: ", className, path);
 				try {
 					classes.add(Class.forName(className));
-				} catch (Throwable e) {
+				} catch (Exception e) {
 					log("Couldn't create class %s. %s: ", className, e);
 				}
 			}
@@ -149,7 +138,7 @@ public class ClasspathInspector {
 		return classes;
 	}
 
-	private static List<File> listFiles(File directory, FilenameFilter filter, boolean recurse) {
+	private static List<File> listFiles(File directory, String filterExtension, boolean recurse) {
 		List<File> files = new ArrayList<>();
 		File[] entries = directory.listFiles();
 
@@ -157,17 +146,16 @@ public class ClasspathInspector {
 		for (File entry : entries) {
 			// If there is no filter or the filter accepts the
 			// file / directory, add it to the list
-			if (filter == null || filter.accept(directory, entry.getName())) {
+			if (filterExtension == null || entry.getName().endsWith(filterExtension)) {
 				files.add(entry);
 			}
 
 			// If the file is a directory and the recurse flag
 			// is set, recurse into the directory
 			if (recurse && entry.isDirectory()) {
-				files.addAll(listFiles(entry, filter, recurse));
+				files.addAll(listFiles(entry, filterExtension, recurse));
 			}
 		}
-
 		// Return collection of files
 		return files;
 	}
@@ -183,7 +171,6 @@ public class ClasspathInspector {
 		return urls;
 	}
 
-	// todo: this is only partial, probably
 	public static URL normalize(URL url) throws MalformedURLException {
 		String spec = url.getFile();
 
@@ -205,21 +192,25 @@ public class ClasspathInspector {
 		return url;
 	}
 
-	private static void log(String pattern, final Object... args) {
-		if (DEBUG) {
-			System.out.printf(pattern + "\n", args);
+	public static void main(String[] args) {
+		// find all classes in classpath
+		List<Class<?>> allClasses = ClasspathInspector.getAllKnownClasses();
+		log(String.format("There are %d classes available in the classpath", allClasses.size()));
+
+		// find all classes that implement/subclass an interface/superclass
+		List<Class<?>> serializableClasses = ClasspathInspector.getMatchingClasses(Serializable.class);
+		for (Class<?> clazz : serializableClasses) {
+			log(String.format("%s is Serializable", clazz.getName()));
 		}
 	}
 
-	public static void main(String[] args) {
-		// find all classes in classpath
-		List<Class> allClasses = ClasspathInspector.getAllKnownClasses();
-		System.out.printf("There are %s classes available in the classpath\n", allClasses.size());
-
-		// find all classes that implement/subclass an interface/superclass
-		List<Class> serializableClasses = ClasspathInspector.getMatchingClasses(Serializable.class);
-		for (Class clazz : serializableClasses) {
-			System.out.printf("%s is Serializable\n", clazz);
+	private static void log(String pattern, final Object... args) {
+		if (debug) {
+			log(String.format(pattern, args));
 		}
+	}
+
+	private static void log(String message) {
+		System.out.println(message);
 	}
 }
