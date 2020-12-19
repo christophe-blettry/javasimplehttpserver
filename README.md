@@ -67,6 +67,7 @@ public class TestClassTest {
 }
 ````
 
-Example of an "api class" [here] (https://github.com/christophe-blettry/javasimplehttpserver/blob/main/src/main/java/net/microfaas/net/simplehttp/example/ApiExample.java)
+[Example of an "api class"]
 
 [test example]: https://github.com/christophe-blettry/javasimplehttpserver/blob/main/src/test/java/net/microfaas/net/simplehttp/main/TestClassTest.java
+[Example of an "api class"]: https://github.com/christophe-blettry/javasimplehttpserver/blob/main/src/main/java/net/microfaas/net/simplehttp/example/ApiExample.java
