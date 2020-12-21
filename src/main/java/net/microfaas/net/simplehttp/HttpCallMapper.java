@@ -6,7 +6,11 @@
 package net.microfaas.net.simplehttp;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -16,14 +20,17 @@ import java.util.regex.Pattern;
  */
 public class HttpCallMapper {
 
-	private static final HashMap<String, HttpCallMapper> MAPPER = new HashMap<>();
+	private static final Map<HttpMethodEnum,List<HttpCallMapper>> MAPPER = new HashMap<>();
 
-	private final Class classe;
-	private final Method method;
-	private final HttpStatusEnum onSuccess;
-	private String pat;
 	private HttpMethodEnum httpMethod;
 	private Pattern pattern;
+	private final HttpStatusEnum onSuccess;
+	private final Class classe;
+	private final Method method;
+	private String pat;
+	static {
+		Arrays.asList(HttpMethodEnum.values()).forEach(m -> MAPPER.put(m,new ArrayList<>()));
+	}
 
 	public HttpCallMapper(RequestMapping requestMapping, Class classe, Method method) {
 		this.classe = classe;
@@ -34,13 +41,13 @@ public class HttpCallMapper {
 		if (path != null) {
 			this.pat = computePattern(path);
 			this.pattern = Pattern.compile(pat);
-			MAPPER.put(path, this);
+			MAPPER.get(this.httpMethod).add(this);
 		}
 	}
 
 	static Optional<HttpCallMapper> findByPath(String path, HttpMethodEnum method) {
 //		System.out.println(HttpCallMapper.class.getName()+".findByPath: "+path);
-		return MAPPER.values().stream().filter(hcm -> hcm.getHttpMethod().equals(method) && hcm.pattern.matcher(path).matches()).findFirst();
+		return MAPPER.get(method).stream().filter(hcm -> hcm.pattern.matcher(path).matches()).findFirst();
 	}
 
 	public Class getClasse() {
@@ -72,12 +79,14 @@ public class HttpCallMapper {
 
 	@Override
 	public String toString() {
-		return "HttpCallMapper{" + "classe=" + classe + ", method=" + method + ", pattern=" + pattern + '}';
+		return "HttpCallMapper{" + "httpMethod=" + httpMethod + ", pattern=" + pattern + ", onSuccess=" + onSuccess + ", classe=" + classe + ", method=" + method + ", pat=" + pat + '}';
 	}
 
 	public static String toGlobalString() {
 		StringBuilder sb = new StringBuilder();
-		MAPPER.values().forEach(hcm -> sb.append(hcm.toString()).append("\n"));
+		MAPPER.values().forEach(l -> {
+			l.forEach(hcm -> sb.append(hcm.toString()).append("\n"));
+		});
 		return sb.toString();
 	}
 }
