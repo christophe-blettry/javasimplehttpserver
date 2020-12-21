@@ -124,7 +124,7 @@ public class HttpServer implements Runnable {
 			ch.closeFuture().sync();
 		} catch (InterruptedException ex) {
 			this.threadStarted.completeExceptionally(ex);
-			System.out.println("interrupted " + ex.toString());
+//			System.out.println("interrupted " + ex.toString());
 			Thread.currentThread().interrupt();
 		} finally {
 			this.threadStarted.complete(true);
@@ -142,7 +142,7 @@ public class HttpServer implements Runnable {
 	}
 
 	public void shutdown() {
-		System.out.println(new Date().toInstant() + " shutdown required");
+//		System.out.println(new Date().toInstant() + " shutdown required");
 		currentThread.interrupt();
 	}
 

@@ -20,7 +20,7 @@ public class HttpCallMapper {
 
 	private final Class classe;
 	private final Method method;
-	private final int onSuccess;
+	private final HttpStatusEnum onSuccess;
 	private String pat;
 	private HttpMethodEnum httpMethod;
 	private Pattern pattern;
@@ -51,7 +51,7 @@ public class HttpCallMapper {
 		return method;
 	}
 
-	public int getOnSuccess() {
+	public HttpStatusEnum getOnSuccess() {
 		return onSuccess;
 	}
 

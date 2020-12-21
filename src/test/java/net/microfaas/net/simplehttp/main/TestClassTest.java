@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import net.microfaas.net.simplehttp.HttpHeaderNames;
 import net.microfaas.net.simplehttp.HttpServer;
+import net.microfaas.net.simplehttp.HttpStatusEnum;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -91,11 +92,11 @@ public class TestClassTest {
 		Request request = new Request.Builder()
 				.url(server.getBaseUrl() + "/host")
 				.build();
-		int result = 0;
+		int resultCode = 0;
 		try (Response response = client.newCall(request).execute()) {
-			result = response.code();
+			resultCode = response.code();
 		}
-		assertEquals(result, 204);
+		assertEquals(HttpStatusEnum.NO_CONTENT.code(), resultCode);
 	}
 
 	/**
@@ -108,9 +109,12 @@ public class TestClassTest {
 				.url(server.getBaseUrl() + "/addheader")
 				.build();
 		List<String> result = new ArrayList<>();
+		int resultCode = 0;
 		try (Response response = client.newCall(request).execute()) {
+			resultCode = response.code();
 			result = response.headers(ApiExample.ADD_HEADER_NAME);
 		}
+		assertEquals(HttpStatusEnum.OK.code(), resultCode);
 		assertFalse(result.isEmpty());
 		if (!result.isEmpty()) {
 			assertTrue(result.get(0).startsWith(ApiExample.ADD_HEADER_VALUE));
@@ -130,7 +134,7 @@ public class TestClassTest {
 		try (Response response = client.newCall(request).execute()) {
 			result = response.code();
 		}
-		assertEquals(result, 204);
+		assertEquals(HttpStatusEnum.NO_CONTENT.code(), result);
 
 	}
 
@@ -151,7 +155,34 @@ public class TestClassTest {
 			resultCode = response.code();
 			result = response.body().string();
 		}
-		assertEquals(resultCode, 200);
+		assertEquals(HttpStatusEnum.OK.code(), resultCode);
+		assertEquals(result, auth);
+	}
+
+	/**
+	 * Test of getHeaderAuth method, of class ApiExample.
+	 */
+	@Test
+	public void testGetHeaderAuth2() throws IOException {
+		System.out.println("testGetHeaderAuth2");
+		String auth = "Bearer " + UUID.randomUUID().toString();
+		String name = "NAME" + UUID.randomUUID().toString();
+		int value = random.nextInt(Integer.MAX_VALUE - 10);
+		BeanExample dto = new BeanExample(value, name);
+		System.out.println("testGetHeaderAuth2: dto: " + dto.toString());
+		RequestBody reqbody = RequestBody.create(new Gson().toJson(dto), JSON);
+		Request request = new Request.Builder()
+				.url(server.getBaseUrl() + "/auth2")
+				.post(reqbody)
+				.addHeader(HttpHeaderNames.AUTHORIZATION.toString(), auth)
+				.build();
+		int resultCode = 0;
+		String result = null;
+		try (Response response = client.newCall(request).execute()) {
+			resultCode = response.code();
+			result = response.body().string();
+		}
+		assertEquals(HttpStatusEnum.OK.code(), resultCode);
 		assertEquals(result, auth);
 	}
 
@@ -168,7 +199,7 @@ public class TestClassTest {
 		try (Response response = client.newCall(request).execute()) {
 			result = response.code();
 		}
-		assertEquals(result, 204);
+		assertEquals(HttpStatusEnum.NO_CONTENT.code(), result);
 	}
 
 	/**
@@ -186,7 +217,7 @@ public class TestClassTest {
 		try (Response response = client.newCall(request).execute()) {
 			result = response.code();
 		}
-		assertEquals(result, 200);
+		assertEquals(HttpStatusEnum.OK.code(), result);
 	}
 
 	/**
@@ -211,7 +242,7 @@ public class TestClassTest {
 			result = response.body().string();
 			System.out.println("postTestDto: result: " + result);
 		}
-		assertEquals(resultCode, 200);
+		assertEquals(HttpStatusEnum.OK.code(), resultCode);
 		assertTrue(result.contains(name.toUpperCase()));
 		assertTrue(result.contains(Integer.toString(value + 1)));
 	}
@@ -232,7 +263,7 @@ public class TestClassTest {
 			resultCode = response.code();
 			result = response.body().string();
 		}
-		assertEquals(resultCode, 200);
+		assertEquals(HttpStatusEnum.OK.code(), resultCode);
 		assertTrue(result.contains(ApiExample.TEST2));
 		assertTrue(result.contains(id));
 	}
@@ -253,7 +284,7 @@ public class TestClassTest {
 			resultCode = response.code();
 			result = response.body().string();
 		}
-		assertEquals(resultCode, 200);
+		assertEquals(HttpStatusEnum.OK.code(), resultCode);
 		assertTrue(result.contains(ApiExample.TEST3));
 		assertTrue(result.contains(id));
 	}
@@ -275,7 +306,7 @@ public class TestClassTest {
 			resultCode = response.code();
 			result = response.body().string();
 		}
-		assertEquals(resultCode, 200);
+		assertEquals(HttpStatusEnum.OK.code(), resultCode);
 		assertTrue(result.contains(ApiExample.TEST4));
 		assertTrue(result.contains(id));
 		assertTrue(result.contains(id2));
@@ -298,7 +329,7 @@ public class TestClassTest {
 			resultCode = response.code();
 			result = response.body().string();
 		}
-		assertEquals(resultCode, 200);
+		assertEquals(HttpStatusEnum.OK.code(), resultCode);
 		assertTrue(result.contains(ApiExample.TEST5));
 		assertTrue(result.contains(id));
 		assertTrue(result.contains(id2));
@@ -322,7 +353,7 @@ public class TestClassTest {
 			resultCode = response.code();
 			result = response.body().string();
 		}
-		assertEquals(resultCode, 200);
+		assertEquals(HttpStatusEnum.OK.code(), resultCode);
 		assertTrue(result.contains(ApiExample.TEST6));
 		assertTrue(result.contains(rp));
 		assertTrue(result.contains(id));
@@ -342,7 +373,7 @@ public class TestClassTest {
 		try (Response response = client.newCall(request).execute()) {
 			result = response.code();
 		}
-		assertEquals(result, 409);
+		assertEquals(HttpStatusEnum.CONFLICT.code(), result);
 	}
 
 	/**
@@ -358,10 +389,10 @@ public class TestClassTest {
 		try (Response response = client.newCall(request).execute()) {
 			result = response.code();
 		}
-		assertEquals(result, 500);
+		assertEquals(HttpStatusEnum.INTERNAL_SERVER_ERROR.code(), result);
 	}
 
-		/**
+	/**
 	 * Test of getTest6 method, of class ApiExample.
 	 */
 	@Test
@@ -369,8 +400,8 @@ public class TestClassTest {
 		System.out.println("testBean");
 		String name = UUID.randomUUID().toString();
 		int value = new Random().nextInt(Integer.MAX_VALUE);
-		BeanExample bean = new BeanExample(value,name);
-		System.out.println("testBean: bean:       "+bean);
+		BeanExample bean = new BeanExample(value, name);
+		System.out.println("testBean: bean:       " + bean);
 		Request request = new Request.Builder()
 				.url(server.getBaseUrl() + "/beanexample?value=" + value + "&name=" + name)
 				.build();
@@ -380,9 +411,9 @@ public class TestClassTest {
 			resultCode = response.code();
 			result = response.body().string();
 			BeanExample beanResult = new Gson().fromJson(result, BeanExample.class);
-			System.out.println("testBean: beanResult: "+beanResult);
-			assertEquals(resultCode, 200);
+			System.out.println("testBean: beanResult: " + beanResult);
 			assertTrue(bean.equals(beanResult));
 		}
+		assertEquals(HttpStatusEnum.OK.code(), resultCode);
 	}
 }

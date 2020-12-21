@@ -5,8 +5,6 @@
  */
 package net.microfaas.net.simplehttp;
 
-import io.netty.handler.codec.http.HttpResponseStatus;
-
 /**
  *
  * @author christophe
@@ -14,28 +12,28 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 public class SimpleHttpException extends RuntimeException {
 
 	private String reasonPhrase;
-	protected HttpResponseStatus status;
+	protected HttpStatusEnum status;
 
 	public SimpleHttpException() {
-		status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
+		status = HttpStatusEnum.INTERNAL_SERVER_ERROR;
 	}
 
 	public SimpleHttpException(String message) {
 		super(message);
-		status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
+		status = HttpStatusEnum.INTERNAL_SERVER_ERROR;
 	}
 
 	public SimpleHttpException(String message, Throwable cause) {
 		super(message, cause);
-		status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
+		status = HttpStatusEnum.INTERNAL_SERVER_ERROR;
 	}
 
 	public SimpleHttpException(Throwable cause) {
 		super(cause);
-		status = HttpResponseStatus.INTERNAL_SERVER_ERROR;
+		status = HttpStatusEnum.INTERNAL_SERVER_ERROR;
 	}
 
-	public HttpResponseStatus getStatus() {
+	public HttpStatusEnum getStatus() {
 		return status;
 	}
 

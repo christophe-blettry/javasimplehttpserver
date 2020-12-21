@@ -5,7 +5,7 @@
  */
 package net.microfaas.net.simplehttp.exception;
 
-import io.netty.handler.codec.http.HttpResponseStatus;
+import net.microfaas.net.simplehttp.HttpStatusEnum;
 import net.microfaas.net.simplehttp.SimpleHttpException;
 
 /**
@@ -16,22 +16,22 @@ public class ConflictException extends SimpleHttpException {
 
 
 	public ConflictException() {
-		status = HttpResponseStatus.CONFLICT;
+		status = HttpStatusEnum.CONFLICT;
 	}
 
 	public ConflictException(String message) {
 		super(message);
-		status = HttpResponseStatus.CONFLICT;
+		status = HttpStatusEnum.CONFLICT;
 	}
 
 	public ConflictException(String message, Throwable cause) {
 		super(message, cause);
-		status = HttpResponseStatus.CONFLICT;
+		status = HttpStatusEnum.CONFLICT;
 	}
 
 	public ConflictException(Throwable cause) {
 		super(cause);
-		status = HttpResponseStatus.CONFLICT;
+		status = HttpStatusEnum.CONFLICT;
 	}
 
 }

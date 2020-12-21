@@ -5,7 +5,7 @@
  */
 package net.microfaas.net.simplehttp.exception;
 
-import io.netty.handler.codec.http.HttpResponseStatus;
+import net.microfaas.net.simplehttp.HttpStatusEnum;
 import net.microfaas.net.simplehttp.SimpleHttpException;
 
 /**
@@ -15,22 +15,22 @@ import net.microfaas.net.simplehttp.SimpleHttpException;
 public class UnauthorizedException extends SimpleHttpException {
 
 	public UnauthorizedException() {
-		status = HttpResponseStatus.UNAUTHORIZED;
+		status = HttpStatusEnum.UNAUTHORIZED;
 	}
 
 	public UnauthorizedException(String message) {
 		super(message);
-		status = HttpResponseStatus.UNAUTHORIZED;
+		status = HttpStatusEnum.UNAUTHORIZED;
 	}
 
 	public UnauthorizedException(String message, Throwable cause) {
 		super(message, cause);
-		status = HttpResponseStatus.UNAUTHORIZED;
+		status = HttpStatusEnum.UNAUTHORIZED;
 	}
 
 	public UnauthorizedException(Throwable cause) {
 		super(cause);
-		status = HttpResponseStatus.UNAUTHORIZED;
+		status = HttpStatusEnum.UNAUTHORIZED;
 	}
 
 }

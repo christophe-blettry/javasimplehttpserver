@@ -23,8 +23,8 @@ public class HttpMethodInvokerResponse {
 	private int code = 500;
 	private List<Map.Entry<String,String>> headers;
 
-	HttpMethodInvokerResponse(Object methodResponse, int onSuccess) {
-		this.code = onSuccess;
+	HttpMethodInvokerResponse(Object methodResponse, HttpStatusEnum onSuccess) {
+		this.code = onSuccess.code();
 		if (methodResponse instanceof String) {
 			setBytes(((String) methodResponse).getBytes());
 			return;
@@ -37,7 +37,7 @@ public class HttpMethodInvokerResponse {
 			HttpResponseEntity e = (HttpResponseEntity) methodResponse;
 			setBytes(e.getBody());
 			setHeaders(e.getHeaders());	
-			this.code = e.getStatusCode() != 0 ? e.getStatusCode() : onSuccess;
+			this.code = e.getStatusCode() != 0 ? e.getStatusCode() : onSuccess.code();
 			return;
 		}
 		setBytes(new Gson().toJson(methodResponse).getBytes());

@@ -5,7 +5,7 @@
  */
 package net.microfaas.net.simplehttp.exception;
 
-import io.netty.handler.codec.http.HttpResponseStatus;
+import net.microfaas.net.simplehttp.HttpStatusEnum;
 import net.microfaas.net.simplehttp.SimpleHttpException;
 
 /**
@@ -16,22 +16,22 @@ public class ForbiddenException extends SimpleHttpException {
 
 
 	public ForbiddenException() {
-		status = HttpResponseStatus.FORBIDDEN;
+		status = HttpStatusEnum.FORBIDDEN;
 	}
 
 	public ForbiddenException(String message) {
 		super(message);
-		status = HttpResponseStatus.FORBIDDEN;
+		status = HttpStatusEnum.FORBIDDEN;
 	}
 
 	public ForbiddenException(String message, Throwable cause) {
 		super(message, cause);
-		status = HttpResponseStatus.FORBIDDEN;
+		status = HttpStatusEnum.FORBIDDEN;
 	}
 
 	public ForbiddenException(Throwable cause) {
 		super(cause);
-		status = HttpResponseStatus.FORBIDDEN;
+		status = HttpStatusEnum.FORBIDDEN;
 	}
 
 }

@@ -5,7 +5,7 @@
  */
 package net.microfaas.net.simplehttp.exception;
 
-import io.netty.handler.codec.http.HttpResponseStatus;
+import net.microfaas.net.simplehttp.HttpStatusEnum;
 import net.microfaas.net.simplehttp.SimpleHttpException;
 
 /**
@@ -15,22 +15,22 @@ import net.microfaas.net.simplehttp.SimpleHttpException;
 public class NotFoundException extends SimpleHttpException {
 
 	public NotFoundException() {
-		status = HttpResponseStatus.NOT_FOUND;
+		status = HttpStatusEnum.NOT_FOUND;
 	}
 
 	public NotFoundException(String message) {
 		super(message);
-		status = HttpResponseStatus.NOT_FOUND;
+		status = HttpStatusEnum.NOT_FOUND;
 	}
 
 	public NotFoundException(String message, Throwable cause) {
 		super(message, cause);
-		status = HttpResponseStatus.NOT_FOUND;
+		status = HttpStatusEnum.NOT_FOUND;
 	}
 
 	public NotFoundException(Throwable cause) {
 		super(cause);
-		status = HttpResponseStatus.NOT_FOUND;
+		status = HttpStatusEnum.NOT_FOUND;
 	}
 
 }

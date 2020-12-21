@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD})
 public @interface RequestMapping {
 	String value();
-	int success() default 200;
+	HttpStatusEnum success() default HttpStatusEnum.OK;
 	HttpMethodEnum method () default HttpMethodEnum.GET;
 	String[] headers() default {};
 }

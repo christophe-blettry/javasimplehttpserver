@@ -10,6 +10,7 @@ import java.util.Date;
 import net.microfaas.net.simplehttp.HttpHeaderNames;
 import net.microfaas.net.simplehttp.HttpMethodEnum;
 import net.microfaas.net.simplehttp.HttpResponseEntity;
+import net.microfaas.net.simplehttp.HttpStatusEnum;
 import net.microfaas.net.simplehttp.SimpleHttpException;
 import net.microfaas.net.simplehttp.PathVariable;
 import net.microfaas.net.simplehttp.RequestBody;
@@ -40,7 +41,7 @@ public class ApiExample {
 		return HELLO_W + new Date().toString();
 	}
 
-	@RequestMapping(value = "/host", success = 204)
+	@RequestMapping(value = "/host", success = HttpStatusEnum.NO_CONTENT)
 	public void getHeaderHost(@RequestHeader("host") String h) {
 		log(ApiExample.class.getName() + ".getHeaderHost: " + h);
 	}
@@ -54,7 +55,7 @@ public class ApiExample {
 		return entity;
 	}
 
-	@RequestMapping(value = "/useragent", success = 204)
+	@RequestMapping(value = "/useragent", success = HttpStatusEnum.NO_CONTENT)
 	public void getHeaderUserAgent(@RequestHeader("User-Agent") String h) {
 		log(ApiExample.class.getName() + ".getHeaderUserAgent: " + h);
 		if (h == null) {
@@ -62,7 +63,7 @@ public class ApiExample {
 		}
 	}
 
-	@RequestMapping(value = "/auth", success = 200)
+	@RequestMapping(value = "/auth", success = HttpStatusEnum.OK)
 	public String getHeaderAuth(@RequestHeader(name = HttpHeaderNames.AUTHORIZATION) String h) {
 		log(ApiExample.class.getName() + ".getHeaderAuth: " + h);
 		if (h == null) {
@@ -72,7 +73,18 @@ public class ApiExample {
 		}
 	}
 
-	@RequestMapping(value = "/nocontent", success = 204)
+	@RequestMapping(value = "/auth2", method = HttpMethodEnum.POST)
+	public String getHeaderAuth2(@RequestBody BeanExample dto, @RequestHeader(name = HttpHeaderNames.AUTHORIZATION) String h) {
+		log(ApiExample.class.getName() + ".getHeaderAuth2: auth: " + h);
+		log(ApiExample.class.getName() + ".getHeaderAuth2: body: " + dto);
+		if (h == null) {
+			throw new BadRequestException().setReasonPhrase("header 'Authorization' not found");
+		} else {
+			return h;
+		}
+	}
+
+	@RequestMapping(value = "/nocontent", success = HttpStatusEnum.NO_CONTENT)
 	public void getNoContent() {
 		log(ApiExample.class.getName() + ".getNoContent");
 	}
@@ -135,8 +147,8 @@ public class ApiExample {
 
 	@RequestMapping("/beanexample")
 	public BeanExample getTestDto(@RequestParam("value") String v, @RequestParam("name") String name) {
-		int value=Integer.parseInt(v);
-		return new BeanExample(value,name);
+		int value = Integer.parseInt(v);
+		return new BeanExample(value, name);
 	}
 
 	private void log(String message) {

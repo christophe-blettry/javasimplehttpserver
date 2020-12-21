@@ -58,7 +58,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 		if (b != null) {
 			if (b.getException() == null) {
 //				System.out.println(this.getClass().getName() + ".channelRead0: response length " + (b.getBytes() != null ? b.getBytes().length : 0));
-//				System.out.println(this.getClass().getName() + ".channelRead0: HttpResponseStatus " + HttpResponseStatus.valueOf(b.getCode()));
+//				System.out.println(this.getClass().getName() + ".channelRead0: HttpResponseStatus " + HttpResponseStatus.valueOf(b.code()));
 				FullHttpResponse r = new DefaultFullHttpResponse(req.protocolVersion(), HttpResponseStatus.valueOf(b.getCode()),
 						b.getBytes() != null ? Unpooled.wrappedBuffer(b.getBytes()) : ctx.alloc().buffer(0));
 				if (b.getHeaders() != null && !b.getHeaders().isEmpty()) {
@@ -70,7 +70,8 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 			if (b.getException() instanceof SimpleHttpException) {
 				SimpleHttpException ex = (SimpleHttpException) b.getException();
 				ByteBuf reasonPhrase = ex.getReasonPhrase() != null ? Unpooled.wrappedBuffer(ex.getReasonPhrase().getBytes()) : ctx.alloc().buffer(0);
-				sendHttpResponse(ctx, req, new DefaultFullHttpResponse(req.protocolVersion(), ex.getStatus(), reasonPhrase));
+				HttpResponseStatus status = HttpResponseStatus.valueOf(ex.getStatus().code());
+				sendHttpResponse(ctx, req, new DefaultFullHttpResponse(req.protocolVersion(), status, reasonPhrase));
 				return;
 			}
 		}
