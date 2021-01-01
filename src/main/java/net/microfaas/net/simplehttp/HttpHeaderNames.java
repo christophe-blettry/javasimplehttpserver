@@ -24,5 +24,5 @@ public enum HttpHeaderNames {
 	public String toString() {
 		return name;
 	}
-	
+
 }

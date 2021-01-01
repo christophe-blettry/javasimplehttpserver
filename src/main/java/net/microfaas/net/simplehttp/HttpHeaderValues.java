@@ -22,6 +22,8 @@ public class HttpHeaderValues {
 	public static final String JPEG = "image/jpeg";
 	public static final String PNG = "image/png";
 
+	public static final String OCTET_STREAM = "application/octet-stream";
+
 	private HttpHeaderValues() {
 	}
 

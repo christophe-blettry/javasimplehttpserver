@@ -25,6 +25,7 @@ public enum HttpStatusEnum {
 	PROXY_AUTHENTIFICATION_REQUIRED(407),
 	REQUEST_TIMEOUT(408),
 	CONFLICT(409),
+	X_BAD_REQUEST(490), // must have reponse body to indicate to the client the reason of the error
 	INTERNAL_SERVER_ERROR(500),
 	NOT_IMPLEMENTED(501);
 
