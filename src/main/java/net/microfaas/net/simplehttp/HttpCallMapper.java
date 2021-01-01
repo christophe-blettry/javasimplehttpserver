@@ -72,6 +72,8 @@ public class HttpCallMapper {
 
 	private String computePattern(String path) {
 		String p = path;
+		p = p.replace("{{", "(?<");
+		p = p.replace("}}", ">.+)");
 		p = p.replace("{", "(?<");
 		p = p.replace("}", ">[^/]+)");
 		return "^" + p + "$";

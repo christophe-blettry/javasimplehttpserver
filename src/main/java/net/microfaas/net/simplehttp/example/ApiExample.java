@@ -145,6 +145,16 @@ public class ApiExample {
 		throw new SimpleHttpException();
 	}
 
+	@RequestMapping("/test9/{{fullpath}}")
+	public String getTest9(@PathVariable("fullpath") String fullpath) {
+		return fullpath;
+	}
+
+	@RequestMapping("/test10/{oth}/{{fullpath}}")
+	public String getTest10(@PathVariable("oth") String oth, @PathVariable("fullpath") String fullpath) {
+		return oth+"::"+fullpath;
+	}
+
 	@RequestMapping("/beanexample")
 	public BeanExample getTestDto(@RequestParam("value") String v, @RequestParam("name") String name) {
 		int value = Integer.parseInt(v);

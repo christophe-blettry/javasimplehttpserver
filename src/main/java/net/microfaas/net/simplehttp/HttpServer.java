@@ -17,7 +17,7 @@ import io.netty.handler.ssl.util.SelfSignedCertificate;
 import java.lang.reflect.Method;
 import java.security.cert.CertificateException;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -36,12 +36,12 @@ public class HttpServer implements Runnable {
 	private final String host;
 	private boolean ssl = false;
 	private boolean selfSigned = false;
-	private Set<String> searchClassForAnnotations;
+	private final Set<String> searchClassForAnnotations = new HashSet<>();
 	private Thread currentThread;
 	private CompletableFuture<Boolean> threadStarted = new CompletableFuture<>();
 
 	public HttpServer() {
-		this.port = 8080;
+		this.port = 80;
 		this.host = "localhost";
 	}
 
@@ -56,7 +56,12 @@ public class HttpServer implements Runnable {
 	}
 
 	public void setSearchClassForAnnotations(Set<String> searchClassForAnnotations) {
-		this.searchClassForAnnotations = searchClassForAnnotations;
+		this.searchClassForAnnotations.clear();
+		this.searchClassForAnnotations.addAll(searchClassForAnnotations);
+	}
+
+	public void addSearchClassForAnnotations(String searchClassForAnnotations) {
+		this.searchClassForAnnotations.add(searchClassForAnnotations);
 	}
 
 	public int getPort() {

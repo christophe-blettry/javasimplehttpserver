@@ -393,6 +393,57 @@ public class TestClassTest {
 	}
 
 	/**
+	 * Test of getTest8 method, of class ApiExample.
+	 */
+	@Test
+	public void testGetTest9() throws IOException {
+		System.out.println("getTest9");
+		String toFind ="js/mon.js";
+		Request request = new Request.Builder()
+				.url(server.getBaseUrl() + "/test9/"+toFind)
+				.build();
+		int resultCode = 0;
+		String result = null;
+		try (Response response = client.newCall(request).execute()) {
+			resultCode = response.code();
+			result = response.body().string();
+			System.out.println("getTest9: result: "+result);
+		}
+		assertEquals(HttpStatusEnum.OK.code(), resultCode);
+		assertEquals(toFind,result);
+	}
+	/**
+	 * Test of getTest8 method, of class ApiExample.
+	 */
+	@Test
+	public void testGetTest10() throws IOException {
+		System.out.println("getTest10");
+		String oth ="other";
+		String toFind ="js/mon/mon.js";
+		Request request = new Request.Builder()
+				.url(server.getBaseUrl() + "/test10/"+oth+"/"+toFind)
+				.build();
+		int resultCode = 0;
+		String result = null;
+		String [] ar=null;
+		try (Response response = client.newCall(request).execute()) {
+			resultCode = response.code();
+			result = response.body().string();
+			System.out.println("getTest10: result: "+result);
+			if(result != null){
+				ar=result.split("::");
+			}
+		}
+		assertEquals(HttpStatusEnum.OK.code(), resultCode);
+		assertTrue(ar!=null);
+		if(ar!=null){
+			assertTrue(ar.length==2);
+			assertEquals(oth,ar[0]);
+			assertEquals(toFind,ar[1]);
+		}
+	}
+	
+	/**
 	 * Test of getTest6 method, of class ApiExample.
 	 */
 	@Test
